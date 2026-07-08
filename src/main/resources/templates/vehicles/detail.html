@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: head"></head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="container mt-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/vehicles">Главная</a></li>
+                <li class="breadcrumb-item active" th:text="${vehicle.name}">ТС</li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <div class="col-md-5">
+                <div class="text-center p-3" style="background-color: #f8f9fa; border-radius: 12px;">
+                    <img th:if="${vehicle.photoUrl != null}" th:src="@{${vehicle.photoUrl}}" class="img-fluid" style="max-height: 400px; object-fit: contain;" alt="Фото ТС">
+                    <img th:unless="${vehicle.photoUrl != null}" th:src="@{/images/default-car.png}" class="img-fluid" style="max-height: 400px; object-fit: contain;" alt="Нет фото">
+                </div>
+                <div class="mt-3 d-flex flex-wrap gap-2 justify-content-center">
+                    <a th:href="@{/vehicles/edit/{id}(id=${vehicle.id})}" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Редактировать
+                    </a>
+                    <a th:href="@{/vehicles/delete/{id}(id=${vehicle.id})}" class="btn btn-danger"
+                       onclick="return confirm('Удалить ТС?')">
+                        <i class="fas fa-trash"></i> Удалить
+                    </a>
+                    <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#photoModal">
+                        <i class="fas fa-camera"></i> Фото
+                    </button>
+                </div>
+                <div class="mt-3 text-center">
+                    <a href="/vehicles" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Назад к списку
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-7">
+                <h2>
+                    <span th:if="${vehicle.brand != null and vehicle.model != null}" 
+                          th:text="${vehicle.brand + ' ' + vehicle.model}"></span>
+                    <span th:if="${vehicle.brand == null or vehicle.model == null}" 
+                          th:text="${vehicle.name}"></span>
+                </h2>
+                <hr>
+                <dl class="row">
+                    <dt class="col-sm-4">Тип</dt>
+                    <dd class="col-sm-8" th:text="${vehicle.type}"></dd>
+
+                    <!-- Для "Другое" добавляем строку с названием -->
+                    <dt class="col-sm-4" th:if="${vehicle.type == 'Другое'}">Название</dt>
+                    <dd class="col-sm-8" th:if="${vehicle.type == 'Другое'}" th:text="${vehicle.name}"></dd>
+
+                    <dt class="col-sm-4">Марка</dt>
+                    <dd class="col-sm-8" th:text="${vehicle.brand ?: '—'}"></dd>
+
+                    <dt class="col-sm-4">Модель</dt>
+                    <dd class="col-sm-8" th:text="${vehicle.model ?: '—'}"></dd>
+
+                    <dt class="col-sm-4">Год выпуска</dt>
+                    <dd class="col-sm-8" th:text="${vehicle.year ?: '—'}"></dd>
+
+                    <dt class="col-sm-4">Госномер</dt>
+                    <dd class="col-sm-8" th:text="${vehicle.licensePlate ?: '—'}"></dd>
+
+                    <dt class="col-sm-4">VIN-номер</dt>
+                    <dd class="col-sm-8" th:text="${vehicle.vin ?: '—'}"></dd>
+
+                    <dt class="col-sm-4">Начальный <span th:if="${vehicle.odometerUnit == 'km'}">пробег</span>
+                        <span th:if="${vehicle.odometerUnit == 'mh'}">моточасы</span></dt>
+                    <dd class="col-sm-8" th:text="${vehicle.initialOdometer ?: '—'}">
+                        <span th:if="${vehicle.odometerUnit == 'km'}"> км</span>
+                        <span th:if="${vehicle.odometerUnit == 'mh'}"> м/ч</span>
+                    </dd>
+
+                    <dt class="col-sm-4">Дата добавления</dt>
+                    <dd class="col-sm-8" th:text="${#temporals.format(vehicle.createdAt, 'dd.MM.yyyy HH:mm')}"></dd>
+                </dl>
+
+                <!-- Действия – с обновлённым dropdown для напоминаний -->
+                <div class="mt-4">
+                    <h5>Действия</h5>
+                    <div class="d-flex flex-wrap gap-2">
+                        <div class="dropdown">
+                            <button class="btn btn-outline-warning dropdown-toggle" type="button" id="expenseDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-money-bill-wave"></i> Расходы
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="expenseDropdown">
+                                <li><a class="dropdown-item" th:href="@{/expenses/history(vehicleId=${vehicle.id})}">
+                                    <i class="fas fa-eye"></i> Показать расходы
+                                </a></li>
+                                <li><a class="dropdown-item" th:href="@{/expenses/add/{id}(id=${vehicle.id})}">
+                                    <i class="fas fa-plus"></i> Добавить расход
+                                </a></li>
+                            </ul>
+                        </div>
+                        <!-- Напоминания dropdown -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-warning dropdown-toggle" type="button" id="reminderDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-bell"></i> Напоминания
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="reminderDropdown">
+                                <li><a class="dropdown-item" th:href="@{/reminders/vehicle/{id}(id=${vehicle.id})}">
+                                    <i class="fas fa-eye"></i> Показать напоминания
+                                </a></li>
+                                <li><a class="dropdown-item" th:href="@{/reminders/add/{id}(id=${vehicle.id})}">
+                                    <i class="fas fa-plus"></i> Добавить напоминание
+                                </a></li>
+                            </ul>
+                        </div>
+                        <!-- Страховка dropdown (показываем только если тип не "Другое") -->
+                        <div class="dropdown" th:if="${vehicle.type != 'Другое'}">
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="insuranceDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-shield-alt"></i> Страховка
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="insuranceDropdown">
+                                <li><a class="dropdown-item" th:href="@{/insurances/vehicle/{id}(id=${vehicle.id})}">
+                                    <i class="fas fa-eye"></i> Показать действующую страховку
+                                </a></li>
+                                <li><a class="dropdown-item" th:href="@{/insurances/add/{id}(id=${vehicle.id})}">
+                                    <i class="fas fa-plus"></i> Добавить новую страховку
+                                </a></li>
+                            </ul>
+                        </div>
+                        <!-- Документы dropdown -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="documentDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-file-alt"></i> Документы
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="documentDropdown">
+                                <li><a class="dropdown-item" th:href="@{/documents/vehicle/{id}(id=${vehicle.id})}">
+                                    <i class="fas fa-eye"></i> Показать документы
+                                </a></li>
+                                <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#documentModal" href="#">
+                                    <i class="fas fa-plus"></i> Добавить документ
+                                </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для загрузки фото -->
+    <div class="modal fade" id="photoModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Загрузить фото</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Загрузка фото для: <span th:text="${vehicle.name}"></span></p>
+                    <form th:action="@{/vehicles/upload-photo/{id}(id=${vehicle.id})}" 
+                          method="post" 
+                          enctype="multipart/form-data">
+                        <input type="file" class="form-control" name="file" accept="image/*" required>
+                        <button type="submit" class="btn btn-primary mt-2">Загрузить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для загрузки документа -->
+    <div class="modal fade" id="documentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Загрузить документ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Загрузка документа для: <span th:text="${vehicle.name}"></span></p>
+                    <form th:action="@{/documents/upload}" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="vehicleId" th:value="${vehicle.id}">
+                        <div class="mb-3">
+                            <label class="form-label">Название документа *</label>
+                            <input type="text" class="form-control" name="documentName" placeholder="Например: ПТС, Договор, Сервисная книжка" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Файл (PDF, JPG, PNG)</label>
+                            <input type="file" class="form-control" name="file" accept=".pdf,.jpg,.jpeg,.png" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Загрузить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="fragments/footer :: scripts"></div>
+</body>
+</html>

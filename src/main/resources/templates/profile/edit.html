@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: head"></head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="container mt-4">
+        <h2>✏️ Редактирование профиля</h2>
+
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <form th:action="@{/profile/edit}" th:object="${profile}" method="post">
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" th:field="*{email}" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Фамилия</label>
+                <input type="text" class="form-control" th:field="*{lastName}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Имя</label>
+                <input type="text" class="form-control" th:field="*{firstName}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Отчество</label>
+                <input type="text" class="form-control" th:field="*{patronymic}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Дата рождения</label>
+                <input type="date" class="form-control" th:field="*{birthDate}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Телефон</label>
+                <input type="tel" class="form-control" th:field="*{phone}" id="phoneInput" placeholder="+7 (999) 999-99-99" maxlength="18">
+                <div class="form-text text-muted">Формат: +7 (XXX) XXX-XX-XX</div>
+            </div>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <a href="/profile" class="btn btn-secondary">Отмена</a>
+        </form>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="fragments/footer :: scripts"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const phoneInput = document.getElementById('phoneInput');
+            if (!phoneInput) return;
+
+            // Функция форматирования номера
+            function formatPhone(value) {
+                // Удаляем все нецифровые символы
+                let numbers = value.replace(/\D/g, '');
+                // Ограничиваем 11 цифрами (для +7)
+                if (numbers.length > 11) numbers = numbers.slice(0, 11);
+                
+                // Если номер начинается с 8, заменяем на 7 (для стандартизации)
+                if (numbers.startsWith('8')) {
+                    numbers = '7' + numbers.slice(1);
+                }
+                
+                // Форматируем
+                let formatted = '';
+                if (numbers.length > 0) {
+                    formatted = '+7';
+                }
+                if (numbers.length > 1) {
+                    formatted += ' (' + numbers.slice(1, 4);
+                }
+                if (numbers.length > 4) {
+                    formatted += ') ' + numbers.slice(4, 7);
+                }
+                if (numbers.length > 7) {
+                    formatted += '-' + numbers.slice(7, 9);
+                }
+                if (numbers.length > 9) {
+                    formatted += '-' + numbers.slice(9, 11);
+                }
+                return formatted;
+            }
+
+            // При вводе
+            phoneInput.addEventListener('input', function(e) {
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                const oldValue = this.value;
+                const newValue = formatPhone(this.value);
+                this.value = newValue;
+                
+                // Восстанавливаем позицию курсора
+                if (oldValue.length !== newValue.length) {
+                    const delta = newValue.length - oldValue.length;
+                    this.setSelectionRange(start + delta, end + delta);
+                }
+            });
+
+            // При потере фокуса (дополнительное форматирование)
+            phoneInput.addEventListener('blur', function() {
+                this.value = formatPhone(this.value);
+            });
+
+            // При загрузке отформатировать существующее значение
+            phoneInput.value = formatPhone(phoneInput.value);
+        });
+    </script>
+</body>
+</html>

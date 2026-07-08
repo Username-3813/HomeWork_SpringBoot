@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: head"></head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="container mt-4">
+        <h2>Редактирование страницы <span th:text="${page}"></span></h2>
+
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+        <form th:action="@{/admin/page/{page}/edit(page=${page})}" method="post">
+            <div class="mb-3">
+                <label class="form-label">Содержимое (HTML)</label>
+                <textarea class="form-control" name="content" rows="15" th:text="${content}"></textarea>
+                <div class="form-text">Вы можете использовать HTML-теги для форматирования.</div>
+            </div>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <a href="/" class="btn btn-secondary">Отмена</a>
+        </form>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="fragments/footer :: scripts"></div>
+</body>
+</html>

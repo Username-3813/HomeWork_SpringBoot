@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: head"></head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="container mt-4">
+        <h2>Расходы пользователя <span th:text="${user.fullName}"></span></h2>
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Категория</th>
+                        <th>Сумма</th>
+                        <th>ТС</th>
+                        <th>Описание</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="e : ${expensePage.content}">
+                        <td th:text="${#temporals.format(e.date, 'dd.MM.yyyy')}"></td>
+                        <td>
+                            <span th:switch="${e.category}">
+                                <span th:case="'REPAIR'">Ремонт</span>
+                                <span th:case="'FUEL'">Топливо</span>
+                                <span th:case="'INSURANCE'">Страховка</span>
+                                <span th:case="'OTHER'">Прочее</span>
+                                <span th:case="'FINE'">Штраф</span>
+                                <span th:case="'WASH'">Мойка</span>
+                                <span th:case="*" th:text="${e.category}"></span>
+                            </span>
+                        </td>
+                        <td th:text="${e.amount}"></td>
+                        <td th:text="${e.vehicle.name}"></td>
+                        <td th:text="${e.description}"></td>
+                    </tr>
+                    <tr th:if="${expensePage.isEmpty()}">
+                        <td colspan="5" class="text-center">Нет расходов</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Пагинация -->
+        <div th:if="${expensePage.totalPages > 1}" class="d-flex justify-content-center">
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item" th:classappend="${!expensePage.hasPrevious()} ? 'disabled' : ''">
+                        <a class="page-link" th:href="@{/admin/user/{id}/expenses(id=${user.id}, page=${expensePage.number - 1})}">&laquo;</a>
+                    </li>
+                    <li th:each="i : ${#numbers.sequence(0, expensePage.totalPages - 1)}"
+                        class="page-item" th:classappend="${i == expensePage.number} ? 'active' : ''">
+                        <a class="page-link" th:href="@{/admin/user/{id}/expenses(id=${user.id}, page=${i})}" th:text="${i + 1}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${!expensePage.hasNext()} ? 'disabled' : ''">
+                        <a class="page-link" th:href="@{/admin/user/{id}/expenses(id=${user.id}, page=${expensePage.number + 1})}">&raquo;</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="text-muted small text-center">
+            Показано <span th:text="${expensePage.numberOfElements}"></span> из <span th:text="${expensePage.totalElements}"></span> записей
+        </div>
+
+        <a href="/admin/users" class="btn btn-secondary mt-3">
+            <i class="fas fa-arrow-left"></i> Назад к списку пользователей
+        </a>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="fragments/footer :: scripts"></div>
+</body>
+</html>

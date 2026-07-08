@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: head"></head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="container mt-4">
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+            <h2><i class="fas fa-car"></i> Мои транспортные средства</h2>
+            <a href="/vehicles/add" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Добавить ТС
+            </a>
+        </div>
+
+        <!-- Фильтр по типу -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form th:action="@{/vehicles}" method="get" class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label">Тип ТС</label>
+                        <select class="form-select" name="type">
+                            <option value="">Все типы</option>
+                            <option value="Автомобиль" th:selected="${param.type == 'Автомобиль'}">Автомобиль</option>
+                            <option value="Мототехника" th:selected="${param.type == 'Мототехника'}">Мототехника</option>
+                            <option value="Снегоход" th:selected="${param.type == 'Снегоход'}">Снегоход</option>
+                            <option value="Квадроцикл" th:selected="${param.type == 'Квадроцикл'}">Квадроцикл</option>
+                            <option value="Лодка" th:selected="${param.type == 'Лодка'}">Лодка</option>
+                            <option value="Другое" th:selected="${param.type == 'Другое'}">Другое</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-filter"></i> Применить
+                        </button>
+                    </div>
+                    <div class="col-md-2">
+                        <a href="/vehicles" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-undo"></i> Сбросить
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Список ТС -->
+        <div th:if="${vehicles.isEmpty()}" class="alert alert-info">
+            <i class="fas fa-info-circle"></i> У вас ещё нет транспортных средств. 
+            <a href="/vehicles/add">Добавьте первое ТС!</a>
+        </div>
+
+        <div th:unless="${vehicles.isEmpty()}" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <div th:each="v : ${vehicles}" class="col">
+                <a th:href="@{/vehicles/{id}(id=${v.id})}" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-img-top text-center p-3" style="height: 200px; background-color: var(--bg-card);">
+                            <img th:if="${v.photoUrl != null}" th:src="@{${v.photoUrl}}" class="img-fluid h-100" style="object-fit: contain;" alt="Фото ТС">
+                            <img th:unless="${v.photoUrl != null}" th:src="@{/images/default-car.png}" class="img-fluid h-100" style="object-fit: contain;" alt="Нет фото">
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <span th:if="${v.type == 'Другое'}">
+                                    <span th:if="${v.brand != null and v.model != null}" 
+                                          th:text="${v.brand + ' ' + v.model}"></span>
+                                    <span th:if="${v.brand == null or v.model == null}" 
+                                          th:text="${v.name}"></span>
+                                    <span class="badge bg-secondary" th:text="${v.name}"></span>
+                                </span>
+                                <span th:unless="${v.type == 'Другое'}">
+                                    <span th:if="${v.brand != null and v.model != null}" 
+                                          th:text="${v.brand + ' ' + v.model}"></span>
+                                    <span th:if="${v.brand == null or v.model == null}" 
+                                          th:text="${v.name}"></span>
+                                    <span class="badge bg-secondary" th:text="${v.type}"></span>
+                                </span>
+                            </h5>
+                            <ul class="list-unstyled small">
+                                <li><strong>Год:</strong> <span th:text="${v.year ?: '—'}"></span></li>
+                                <li><strong>Госномер:</strong> <span th:text="${v.licensePlate ?: '—'}"></span></li>
+                                <li><strong>VIN-номер:</strong> <span th:text="${v.vin ?: '—'}"></span></li>
+                                <li>
+                                    <strong>Начальный <span th:if="${v.odometerUnit == 'km'}">пробег</span>
+                                          <span th:if="${v.odometerUnit == 'mh'}">моточасы</span>:</strong>
+                                    <span th:text="${v.initialOdometer ?: '—'}"></span>
+                                    <span th:if="${v.odometerUnit == 'km'}">км</span>
+                                    <span th:if="${v.odometerUnit == 'mh'}">м/ч</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="fragments/footer :: scripts"></div>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: head"></head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="container mt-4">
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+        <div class="card">
+            <div class="card-header">
+                <h4 th:text="${isEdit} ? 'Редактирование страховки' : 'Добавление страховки'"></h4>
+            </div>
+            <div class="card-body">
+                <form th:action="${isEdit} ? @{/insurances/edit/{id}(id=${insuranceId})} : @{/insurances/add/{vehicleId}(vehicleId=${vehicleId})}"
+                      th:object="${insurance}" method="post" enctype="multipart/form-data">
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Номер полиса *</label>
+                            <input type="text" class="form-control" th:field="*{policyNumber}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Компания</label>
+                            <input type="text" class="form-control" th:field="*{company}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Тип страховки *</label>
+                            <select class="form-select" th:field="*{type}" required>
+                                <option value="OSAGO">ОСАГО</option>
+                                <option value="CASCO">КАСКО</option>
+                                <option value="LIFE">Другое</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Стоимость (руб) *</label>
+                            <input type="number" step="0.01" class="form-control" th:field="*{cost}" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Дата начала *</label>
+                            <input type="date" class="form-control" id="startDate"
+                                   th:value="${#temporals.format(insurance.startDate, 'yyyy-MM-dd')}"
+                                   name="startDate" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Период</label>
+                            <select class="form-select" id="periodSelect" th:field="*{periodMonths}">
+                                <option value="1">1 месяц</option>
+                                <option value="3">3 месяца</option>
+                                <option value="6">6 месяцев</option>
+                                <option value="12">12 месяцев</option>
+                                <option value="0">Другое (указать вручную)</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Дата окончания</label>
+                            <input type="date" class="form-control" id="endDate"
+                                   th:value="${#temporals.format(insurance.endDate, 'yyyy-MM-dd')}"
+                                   name="endDate"
+                                   th:readonly="${insurance.periodMonths != null and insurance.periodMonths != 0}">
+                            <div class="form-text text-muted" id="endDateHint">
+                                Автоматически рассчитывается, если выбран период
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Лицевая сторона (PDF, JPG, PNG)</label>
+                            <input type="file" class="form-control" th:field="*{frontFile}" accept=".pdf,.jpg,.jpeg,.png">
+                            <div class="form-text text-muted">Необязательно</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Обратная сторона (PDF, JPG, PNG)</label>
+                            <input type="file" class="form-control" th:field="*{backFile}" accept=".pdf,.jpg,.jpeg,.png">
+                            <div class="form-text text-muted">Необязательно</div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> <span th:text="${isEdit} ? 'Обновить' : 'Сохранить'"></span>
+                    </button>
+                    <a th:href="@{/vehicles/{id}(id=${vehicleId})}" class="btn btn-secondary">Отмена</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="fragments/footer :: scripts"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const periodSelect = document.getElementById('periodSelect');
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            const endDateHint = document.getElementById('endDateHint');
+
+            function updateEndDate() {
+                const startDate = startDateInput.value;
+                const months = parseInt(periodSelect.value);
+                if (periodSelect.value === '0' || periodSelect.value === '') {
+                    endDateInput.readOnly = false;
+                    endDateHint.textContent = 'Введите дату вручную';
+                } else if (startDate && months > 0) {
+                    const date = new Date(startDate);
+                    date.setMonth(date.getMonth() + months);
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    endDateInput.value = year + '-' + month + '-' + day;
+                    endDateInput.readOnly = true;
+                    endDateHint.textContent = 'Автоматически рассчитано';
+                } else {
+                    endDateInput.value = '';
+                    endDateInput.readOnly = false;
+                    endDateHint.textContent = 'Выберите дату начала или период';
+                }
+            }
+
+            periodSelect.addEventListener('change', updateEndDate);
+            startDateInput.addEventListener('change', function() {
+                if (periodSelect.value !== '0' && periodSelect.value !== '') {
+                    updateEndDate();
+                }
+            });
+
+            // При загрузке страницы сразу пересчитать
+            updateEndDate();
+        });
+    </script>
+</body>
+</html>

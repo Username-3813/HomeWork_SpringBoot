@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: head"></head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="container mt-4">
+        <h2>Транспортные средства пользователя <span th:text="${user.fullName}"></span></h2>
+
+        <div th:if="${vehicles.isEmpty()}" class="alert alert-info">
+            У пользователя нет транспортных средств.
+        </div>
+
+        <div th:unless="${vehicles.isEmpty()}" class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Название</th>
+                        <th>Тип</th>
+                        <th>Марка</th>
+                        <th>Модель</th>
+                        <th>Год</th>
+                        <th>Госномер</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="v : ${vehicles}">
+                        <td th:text="${v.name}"></td>
+                        <td th:text="${v.type}"></td>
+                        <td th:text="${v.brand}"></td>
+                        <td th:text="${v.model}"></td>
+                        <td th:text="${v.year}"></td>
+                        <td th:text="${v.licensePlate}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <a href="/admin/users" class="btn btn-secondary mt-3">
+            <i class="fas fa-arrow-left"></i> Назад к списку пользователей
+        </a>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="fragments/footer :: scripts"></div>
+</body>
+</html>

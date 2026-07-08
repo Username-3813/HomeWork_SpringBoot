@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: head"></head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="container mt-4">
+        <h2>📅 Календарь напоминаний</h2>
+
+        <div th:if="${groupedNotifications == null or groupedNotifications.isEmpty()}" class="alert alert-info">
+            Нет ни одного напоминания.
+        </div>
+
+        <div th:unless="${groupedNotifications == null or groupedNotifications.isEmpty()}">
+            <div th:each="entry : ${groupedNotifications}">
+                <h4 th:text="${#temporals.format(entry.key, 'dd MMMM yyyy')}"></h4>
+                <hr>
+                <div th:each="n : ${entry.value}" class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h5 class="card-title">
+                                    <span class="badge" th:class="${n.type == 'MAINTENANCE'} ? 'bg-warning' : 'bg-info'">
+                                    </span>
+                                    <span th:text="${n.title}"></span>
+                                </h5>
+                                <!-- Информация о ТС: марка, модель, тип (или название для "Другое") -->
+                                <p class="card-text mt-1">
+                                    <span th:if="${n.brand != null and n.model != null}" th:text="${n.brand + ' ' + n.model}"></span>
+                                    <span th:if="${n.brand == null or n.model == null}" th:text="${n.vehicleName}"></span>
+                                    <span class="badge bg-secondary" th:text="${n.vehicleType == 'Другое' ? n.vehicleName : n.vehicleType}"></span>
+                                </p>
+                                <p class="card-text" th:if="${n.cost != null}">
+                                    <strong>Стоимость:</strong> <span th:text="${n.cost}"></span> руб.
+                                </p>
+                                <p class="card-text" th:text="${n.description != null and !n.description.isEmpty()} ? ${n.description} : 'Нет описания'"></p>
+                            </div>
+                            <div>
+                                <span th:if="${n.type == 'MAINTENANCE' and n.isDone != null and n.isDone}" class="badge bg-success">
+                                    <i class="fas fa-check"></i> Выполнено
+                                </span>
+                                <span th:if="${n.type == 'MAINTENANCE' and n.isDone != null and !n.isDone}" class="badge bg-warning">
+                                    <i class="fas fa-clock"></i> Ожидается
+                                </span>
+                                <span th:if="${n.type == 'INSURANCE'}" class="badge bg-info">
+                                    <i class="fas fa-shield-alt"></i> Активна
+                                </span>
+                            </div>
+                        </div>
+                        <a th:href="@{${n.type == 'MAINTENANCE'} ? '/reminders/vehicle/' + ${n.vehicleId} : '/insurances/vehicle/' + ${n.vehicleId}}" 
+                           class="btn btn-sm btn-primary mt-2">Подробнее →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a href="/vehicles" class="btn btn-secondary mt-3">
+            <i class="fas fa-arrow-left"></i> Назад к ТС
+        </a>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="fragments/footer :: scripts"></div>
+</body>
+</html>

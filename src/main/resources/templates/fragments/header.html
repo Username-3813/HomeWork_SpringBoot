@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="head">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Электронный гараж</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Inputmask для маски телефона -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.9/inputmask.min.js"></script>
+    <!-- Собственные стили -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/theme.js}" defer></script>
+</head>
+
+<header th:fragment="header">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="fas fa-car"></i> Электронный гараж</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="/vehicles"><i class="fas fa-list"></i> ТС</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/expenses/history"><i class="fas fa-money-bill-wave"></i> Расходы</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/calendar"><i class="fas fa-calendar-alt"></i> Календарь</a></li>
+                    <!-- Админ-панель (видна только админам) -->
+                    <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                        <a class="nav-link" href="/admin/users"><i class="fas fa-users-cog"></i> Админ</a>
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav align-items-center">
+                    <!-- Колокольчик -->
+                    <li class="nav-item dropdown" th:if="${#authentication != null}">
+                        <a class="nav-link position-relative" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-bell notification-bell" th:classappend="${notifications != null and !notifications.isEmpty()} ? 'bell-ring' : ''"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill notification-badge" 
+                                  th:if="${notifications != null and !notifications.isEmpty()}" 
+                                  th:text="${notifications.size()}">0</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown" style="min-width: 300px; max-height: 400px; overflow-y: auto;">
+                            <li th:if="${notifications == null or notifications.isEmpty()}">
+                                <span class="dropdown-item text-muted">Нет предстоящих событий</span>
+                            </li>
+                            <li th:each="n : ${notifications}" th:unless="${notifications == null or notifications.isEmpty()}">
+                                <a class="dropdown-item" th:href="@{${n.type == 'MAINTENANCE'} ? '/reminders/vehicle/' + ${n.vehicleId} : '/insurances/vehicle/' + ${n.vehicleId}}">
+                                    <div>
+                                        <i th:if="${n.type == 'MAINTENANCE'}" class="fas fa-wrench text-warning me-1"></i>
+                                        <i th:if="${n.type == 'INSURANCE'}" class="fas fa-shield-alt text-info me-1"></i>
+                                        <strong th:text="${n.vehicleName}"></strong>
+                                        <span class="small text-muted ms-1" th:text="${#temporals.format(n.date, 'dd.MM')}"></span>
+                                    </div>
+                                    <div class="small text-muted">
+                                        <span th:text="${n.title}"></span>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Переключатель тёмной темы -->
+                    <li class="nav-item d-flex align-items-center me-2">
+                        <button id="themeToggle" class="btn btn-outline-light btn-sm rounded-circle" style="width: 36px; height: 36px; padding: 0;">
+                            <i id="themeIcon" class="fas fa-moon"></i>
+                        </button>
+                    </li>
+
+                    <!-- Профиль с выпадающим меню -->
+                    <li class="nav-item dropdown profile-dropdown" th:if="${#authentication != null and currentUser != null}">
+                        <a class="nav-link dropdown-toggle profile-link" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle"></i>
+                            <span class="profile-name">
+                                <!-- Отображаем ФИО, если есть, иначе email -->
+                                <span th:if="${currentUser.firstName != null and currentUser.lastName != null}" 
+                                      th:text="${currentUser.firstName + ' ' + currentUser.lastName}"></span>
+                                <span th:if="${currentUser.firstName == null or currentUser.lastName == null}" 
+                                      th:text="${currentUser.email}"></span>
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="/profile"><i class="fas fa-id-card"></i> Профиль</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form th:action="@{/logout}" method="post" style="display: inline;">
+                                    <button type="submit" class="dropdown-item" style="background: none; border: none; width: 100%; text-align: left;">
+                                        <i class="fas fa-sign-out-alt"></i> Выйти
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Гость -->
+                    <li class="nav-item" th:unless="${#authentication != null}">
+                        <a href="/login" class="btn btn-outline-light btn-sm rounded-pill px-3 shadow-sm">
+                            <i class="fas fa-sign-in-alt"></i> Войти
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+</html>

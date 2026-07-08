@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: head"></head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h4>Подтверждение удаления</h4>
+            </div>
+            <div class="card-body">
+                <p>Вы уверены, что хотите удалить пользователя?</p>
+                <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+                <p><strong>ФИО:</strong> <span th:text="${user.fullName}"></span></p>
+                <p><strong>Количество ТС:</strong> <span th:text="${user.vehicles.size()}"></span></p>
+                <p class="text-danger">Внимание: все данные пользователя (ТС, расходы, напоминания, страховки, документы) будут удалены безвозвратно!</p>
+
+                <form th:action="@{/admin/user/{id}/delete(id=${user.id})}" method="post">
+                    <button type="submit" class="btn btn-danger">Удалить навсегда</button>
+                    <a href="/admin/users" class="btn btn-secondary">Отмена</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="fragments/footer :: scripts"></div>
+</body>
+</html>

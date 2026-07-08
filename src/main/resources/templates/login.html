@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: head"></head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+    <div class="container">
+        <div class="auth-container">
+            <h2>Вход</h2>
+
+            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+            <div th:if="${param.error}" class="alert alert-danger">
+                <span th:text="${session.loginError} ?: 'Неверный email или пароль'"></span>
+                <span th:if="${session.loginError != null and session.loginError.contains('не найден')}">
+                    <a href="/register" class="alert-link"> Зарегистрироваться</a>
+                </span>
+            </div>
+            <div th:if="${param.logout}" class="alert alert-info">Вы вышли</div>
+
+            <form th:action="@{/login}" method="post">
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" 
+                           th:value="${session.email}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Пароль</label>
+                    <div class="input-group">
+                        <input type="password" name="password" class="form-control" id="loginPassword" required>
+                        <button class="btn btn-outline-secondary" type="button" id="toggleLoginPassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Войти</button>
+                <a href="/register" class="btn btn-link w-100">Регистрация</a>
+            </form>
+        </div>
+    </div>
+    <div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="fragments/footer :: scripts"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.getElementById('toggleLoginPassword');
+            const passwordInput = document.getElementById('loginPassword');
+            toggleBtn.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.querySelector('i').classList.toggle('fa-eye');
+                this.querySelector('i').classList.toggle('fa-eye-slash');
+            });
+        });
+    </script>
+</body>
+</html>

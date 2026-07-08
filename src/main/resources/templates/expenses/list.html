@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: head"></head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="container mt-4">
+        <h2>📋 Расходы по ТС</h2>
+
+        <div th:if="${expenses.isEmpty()}" class="alert alert-info">
+            Расходов пока нет.
+        </div>
+
+        <div th:unless="${expenses.isEmpty()}" class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Категория</th>
+                        <th>Сумма</th>
+                        <th>Описание</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="e : ${expenses}">
+                        <td th:text="${#temporals.format(e.date, 'dd.MM.yyyy')}"></td>
+                        <td>
+                            <span th:switch="${e.category}">
+                                <span th:case="'REPAIR'">Ремонт</span>
+                                <span th:case="'FUEL'">Топливо</span>
+                                <span th:case="'INSURANCE'">Страховка</span>
+                                <span th:case="'OTHER'">Прочее</span>
+                                <span th:case="'FINE'">Штраф</span>
+                                <span th:case="'WASH'">Мойка</span>
+                                <span th:case="*" th:text="${e.category}"></span>
+                            </span>
+                        </td>
+                        <td th:text="${e.amount}"></td>
+                        <td th:text="${e.description}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <a th:href="@{/vehicles/{id}(id=${vehicleId})}" class="btn btn-secondary mt-3">
+            <i class="fas fa-arrow-left"></i> Назад к ТС
+        </a>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="fragments/footer :: scripts"></div>
+</body>
+</html>

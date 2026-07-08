@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: head"></head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="container mt-4">
+        <h2 class="mb-3">📋 История расходов</h2>
+
+        <!-- ФИЛЬТРЫ -->
+        <div class="filter-section mb-4">
+            <form method="get" action="/expenses/history" id="filterForm">
+                <input type="hidden" name="page" value="0" />
+                <input type="hidden" name="size" value="10" />
+
+                <div class="filter-group">
+                    <div class="filter-item">
+                        <label>С</label>
+                        <input type="date" name="from" th:value="${from}" />
+                    </div>
+                    <div class="filter-item">
+                        <label>По</label>
+                        <input type="date" name="to" th:value="${to}" />
+                    </div>
+
+                    <div class="filter-item">
+                        <label>Категории</label>
+                        <div class="filter-badges" id="categoryBadges">
+                            <span th:each="cat : ${availableCategories}" 
+                                  class="filter-badge" 
+                                  th:classappend="${selectedCategories != null && selectedCategories.contains(cat.code)} ? 'active' : ''"
+                                  th:data-code="${cat.code}"
+                                  th:text="${cat.displayName}"></span>
+                        </div>
+                    </div>
+
+                    <div class="filter-item">
+                        <label>Типы ТС</label>
+                        <div class="filter-badges" id="typeBadges">
+                            <span th:each="type : ${availableVehicleTypes}" 
+                                  class="filter-badge" 
+                                  th:classappend="${selectedVehicleTypes != null && selectedVehicleTypes.contains(type)} ? 'active' : ''"
+                                  th:data-type="${type}"
+                                  th:text="${type}"></span>
+                        </div>
+                    </div>
+
+                    <div class="filter-item ms-auto">
+                        <button type="submit" class="btn btn-primary btn-sm-custom">Применить</button>
+                        <a href="/expenses/history" class="btn btn-outline-secondary btn-sm-custom">Сбросить</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- КАРТОЧКИ РАСХОДОВ -->
+        <div class="expense-cards">
+            <div th:each="e : ${expensePage.content}" class="expense-card">
+                <div class="expense-card-body">
+                    <div class="expense-card-header">
+                        <span class="expense-category" th:text="${T(com.garage.model.ExpenseCategory).getDisplayName(e.category)}"></span>
+                        <span class="expense-amount" th:text="${#numbers.formatDecimal(e.amount, 1, 2, 'COMMA')}"></span>
+                    </div>
+                    <div class="expense-card-meta">
+                        <span><i class="far fa-calendar-alt"></i> <span th:text="${#temporals.format(e.date, 'dd.MM.yyyy')}"></span></span>
+                        <span>
+                            <i class="fas fa-car"></i>
+                            <span th:if="${e.vehicle.type == 'Другое'}" th:text="${e.vehicle.name}"></span>
+                            <span th:if="${e.vehicle.type != 'Другое'}">
+                                <span th:text="${e.vehicle.brand != null ? e.vehicle.brand : ''}"></span>
+                                <span th:text="${e.vehicle.model != null ? ' ' + e.vehicle.model : ''}"></span>
+                                <span th:if="${e.vehicle.brand == null and e.vehicle.model == null}" th:text="${e.vehicle.name}"></span>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="expense-card-desc" th:if="${e.description != null && !e.description.isEmpty()}">
+                        <span th:text="${e.description}"></span>
+                    </div>
+                </div>
+            </div>
+            <div th:if="${expensePage.isEmpty()}" class="text-center text-muted py-5">
+                <i class="fas fa-inbox fa-3x mb-3"></i>
+                <p>Нет расходов по выбранным фильтрам</p>
+            </div>
+        </div>
+
+        <!-- Пагинация -->
+        <div th:if="${expensePage.totalPages > 1}" class="d-flex justify-content-center mt-4">
+            <nav>
+                <ul class="pagination pagination-sm">
+                    <li class="page-item" th:classappend="${!expensePage.hasPrevious()} ? 'disabled' : ''">
+                        <a class="page-link" 
+                           th:href="@{/expenses/history(page=${expensePage.number - 1}, size=${expensePage.size}, vehicleId=${selectedVehicleId}, from=${from}, to=${to}, categories=${selectedCategories}, vehicleTypes=${selectedVehicleTypes})}">
+                           &laquo;
+                        </a>
+                    </li>
+                    <li th:each="i : ${#numbers.sequence(0, expensePage.totalPages - 1)}"
+                        class="page-item" th:classappend="${i == expensePage.number} ? 'active' : ''">
+                        <a class="page-link" 
+                           th:href="@{/expenses/history(page=${i}, size=${expensePage.size}, vehicleId=${selectedVehicleId}, from=${from}, to=${to}, categories=${selectedCategories}, vehicleTypes=${selectedVehicleTypes})}"
+                           th:text="${i + 1}">
+                        </a>
+                    </li>
+                    <li class="page-item" th:classappend="${!expensePage.hasNext()} ? 'disabled' : ''">
+                        <a class="page-link" 
+                           th:href="@{/expenses/history(page=${expensePage.number + 1}, size=${expensePage.size}, vehicleId=${selectedVehicleId}, from=${from}, to=${to}, categories=${selectedCategories}, vehicleTypes=${selectedVehicleTypes})}">
+                           &raquo;
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="text-muted small text-center mt-2">
+            Показано <span th:text="${expensePage.numberOfElements}"></span> из <span th:text="${expensePage.totalElements}"></span> записей
+        </div>
+
+        <!-- ИТОГОВАЯ ПАНЕЛЬ -->
+        <div class="summary-panel mt-4" th:if="${summary != null}">
+            <div class="summary-stats-grid">
+                <div class="stat-item">
+                    <span class="stat-label">Общая сумма</span>
+                    <span class="stat-value" th:text="${#numbers.formatDecimal(summary.totalExpenses, 1, 2, 'COMMA')}"></span>
+                </div>
+            </div>
+
+            <!-- Разбивка по категориям (горизонтальные бары) -->
+            <div class="category-breakdown-bars" th:if="${!summary.categoryBreakdown.isEmpty()}">
+                <div class="breakdown-title">Разбивка по категориям</div>
+                <div class="breakdown-bars">
+                    <div th:each="cat : ${summary.categoryBreakdown}" class="breakdown-bar-item">
+                        <div class="bar-label">
+                            <span class="bar-category" th:text="${T(com.garage.model.ExpenseCategory).getDisplayName(cat.category)}"></span>
+                            <span class="bar-value" th:text="${#numbers.formatDecimal(cat.totalAmount, 1, 2, 'COMMA')}"></span>
+                        </div>
+                        <div class="bar-track">
+                            <div class="bar-fill" 
+                                 th:style="'width:' + ${summary.totalExpenses > 0 ? (cat.totalAmount / summary.totalExpenses * 100) : 0} + '%;'">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a th:href="@{/vehicles/{id}(id=${selectedVehicleId})}" class="btn btn-secondary mt-3">
+            <i class="fas fa-arrow-left"></i> Назад к ТС
+        </a>
+    </div>
+
+    <!-- Скрипт для бейджей -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function getSelectedCodes(containerId) {
+                const badges = document.querySelectorAll('#' + containerId + ' .filter-badge.active');
+                return Array.from(badges).map(b => b.dataset.code || b.dataset.type);
+            }
+            function updateHiddenInputs() {
+                const form = document.getElementById('filterForm');
+                document.querySelectorAll('input[name="categories"]').forEach(el => el.remove());
+                document.querySelectorAll('input[name="vehicleTypes"]').forEach(el => el.remove());
+                getSelectedCodes('categoryBadges').forEach(val => {
+                    const inp = document.createElement('input');
+                    inp.type = 'hidden';
+                    inp.name = 'categories';
+                    inp.value = val;
+                    form.appendChild(inp);
+                });
+                getSelectedCodes('typeBadges').forEach(val => {
+                    const inp = document.createElement('input');
+                    inp.type = 'hidden';
+                    inp.name = 'vehicleTypes';
+                    inp.value = val;
+                    form.appendChild(inp);
+                });
+            }
+
+            document.querySelectorAll('.filter-badge').forEach(badge => {
+                badge.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    this.classList.toggle('active');
+                    updateHiddenInputs();
+                });
+            });
+            updateHiddenInputs();
+
+            document.getElementById('filterForm').addEventListener('submit', function(e) {
+                document.querySelectorAll('input[name="categories"]').forEach(el => el.remove());
+                document.querySelectorAll('input[name="vehicleTypes"]').forEach(el => el.remove());
+                getSelectedCodes('categoryBadges').forEach(val => {
+                    const inp = document.createElement('input');
+                    inp.type = 'hidden';
+                    inp.name = 'categories';
+                    inp.value = val;
+                    this.appendChild(inp);
+                });
+                getSelectedCodes('typeBadges').forEach(val => {
+                    const inp = document.createElement('input');
+                    inp.type = 'hidden';
+                    inp.name = 'vehicleTypes';
+                    inp.value = val;
+                    this.appendChild(inp);
+                });
+            });
+        });
+    </script>
+
+    <div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="fragments/footer :: scripts"></div>
+</body>
+</html>

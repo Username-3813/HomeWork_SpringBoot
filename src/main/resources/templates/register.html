@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: head"></head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="container">
+        <div class="auth-container">
+            <h2>Регистрация</h2>
+
+            <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+            <form th:action="@{/register}" th:object="${registration}" method="post">
+                <div class="mb-3">
+                    <label class="form-label">Email *</label>
+                    <input type="email" class="form-control" th:field="*{email}" required>
+                    <div th:if="${#fields.hasErrors('email')}" class="text-danger" th:errors="*{email}"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Пароль *</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" th:field="*{password}" id="registerPassword" minlength="6" required>
+                        <button class="btn btn-outline-secondary" type="button" id="toggleRegisterPassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="form-text text-muted">Пароль должен содержать минимум 6 символов</div>
+                    <div th:if="${#fields.hasErrors('password')}" class="text-danger" th:errors="*{password}"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Фамилия</label>
+                    <input type="text" class="form-control" th:field="*{lastName}">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Имя *</label>
+                    <input type="text" class="form-control" th:field="*{firstName}" required>
+                    <div th:if="${#fields.hasErrors('firstName')}" class="text-danger" th:errors="*{firstName}"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Отчество</label>
+                    <input type="text" class="form-control" th:field="*{patronymic}">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Дата рождения</label>
+                    <input type="date" class="form-control" th:field="*{birthDate}">
+                    <div th:if="${#fields.hasErrors('birthDate')}" class="text-danger" th:errors="*{birthDate}"></div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Зарегистрироваться</button>
+                <a href="/login" class="btn btn-link w-100">Уже есть аккаунт?</a>
+            </form>
+        </div>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="fragments/footer :: scripts"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Переключатель пароля
+            const toggleBtn = document.getElementById('toggleRegisterPassword');
+            const passwordInput = document.getElementById('registerPassword');
+            toggleBtn.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.querySelector('i').classList.toggle('fa-eye');
+                this.querySelector('i').classList.toggle('fa-eye-slash');
+            });
+
+        });
+    </script>
+</body>
+</html>

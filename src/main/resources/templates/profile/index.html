@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: head"></head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="container mt-4">
+        <h2>👤 Личный кабинет</h2>
+
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <div class="row">
+            <div class="col-md-4 text-center">
+                <div>
+                    <img th:if="${profile.profilePhoto != null}" th:src="@{${profile.profilePhoto}}" class="rounded-circle img-thumbnail" style="width: 200px; height: 200px; object-fit: cover;">
+                    <img th:unless="${profile.profilePhoto != null}" th:src="@{/images/default-avatar.png}" class="rounded-circle img-thumbnail" style="width: 200px; height: 200px; object-fit: cover;">
+                </div>
+                <form th:action="@{/profile/photo}" method="post" enctype="multipart/form-data" class="mt-3">
+                    <input type="file" class="form-control" name="photo" accept="image/*" required>
+                    <button type="submit" class="btn btn-primary mt-2 w-100">Загрузить фото</button>
+                </form>
+            </div>
+            <div class="col-md-8">
+                <dl class="row">
+                    <dt class="col-sm-4">Фамилия</dt>
+                    <dd class="col-sm-8" th:text="${profile.lastName ?: '—'}"></dd>
+                    <dt class="col-sm-4">Имя</dt>
+                    <dd class="col-sm-8" th:text="${profile.firstName ?: '—'}"></dd>
+                    <dt class="col-sm-4">Отчество</dt>
+                    <dd class="col-sm-8" th:text="${profile.patronymic ?: '—'}"></dd>
+                    <dt class="col-sm-4">Email</dt>
+                    <dd class="col-sm-8" th:text="${profile.email}"></dd>
+                    <dt class="col-sm-4">Дата рождения</dt>
+                    <dd class="col-sm-8" th:text="${profile.birthDate != null ? #temporals.format(profile.birthDate, 'dd.MM.yyyy') : '—'}"></dd>
+                    <dt class="col-sm-4">Телефон</dt>
+                    <dd class="col-sm-8" th:text="${profile.phone ?: '—'}"></dd>
+                </dl>
+
+                <div class="mt-3 d-flex flex-wrap gap-2">
+                    <a href="/profile/edit" class="btn btn-warning">Редактировать профиль</a>
+                    <a href="/profile/password" class="btn btn-secondary">Сменить пароль</a>
+                    <a href="/profile/delete" class="btn btn-danger">Удалить аккаунт</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="fragments/footer :: scripts"></div>
+</body>
+</html>
