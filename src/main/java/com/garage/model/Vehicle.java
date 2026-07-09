@@ -62,9 +62,6 @@ public class Vehicle {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Repair> repairs = new ArrayList<>();
-
-    @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MaintenanceReminder> reminders = new ArrayList<>();
 
 
