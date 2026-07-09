@@ -150,6 +150,11 @@ public class VehicleService {
     }
 
     @Transactional
+    public Vehicle updateVehicle(Vehicle vehicle) {
+        return vehicleRepository.save(vehicle);
+    }
+
+    @Transactional
     public void deleteVehicle(Long id, Long userId) {
         Vehicle vehicle = getVehicleByIdAndUser(id, userId);
         String photoUrl = vehicle.getPhotoUrl();

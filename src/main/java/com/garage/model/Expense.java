@@ -46,4 +46,7 @@ public class Expense {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
+
+    @Column(name = "odometer")
+    private Double odometer;
 }

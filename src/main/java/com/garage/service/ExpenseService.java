@@ -27,20 +27,28 @@ public class ExpenseService {
     private final VehicleService vehicleService;
 
     @Transactional
-    public Expense createExpense(Vehicle vehicle, String category, LocalDate date, Double amount, String description) {
+    public Expense createExpense(Vehicle vehicle, String category, LocalDate date, Double amount, String description, Double odometer) {
         Expense expense = new Expense();
         expense.setVehicle(vehicle);
         expense.setCategory(category);
         expense.setDate(date);
         expense.setAmount(amount);
         expense.setDescription(description);
+        expense.setOdometer(odometer);
+
+        // Если пробег указан — обновляем в ТС
+        if (odometer != null) {
+            vehicle.setInitialOdometer(odometer);
+            vehicleService.updateVehicle(vehicle); // или просто сохранить vehicle
+        }
+
         return expenseRepository.save(expense);
     }
 
     @Transactional
-    public Expense addManualExpense(Long vehicleId, String category, LocalDate date, Double amount, String description, Long userId) {
+    public Expense addManualExpense(Long vehicleId, String category, LocalDate date, Double amount, String description, Double odometer, Long userId) {
         Vehicle vehicle = vehicleService.getVehicleByIdAndUser(vehicleId, userId);
-        return createExpense(vehicle, category, date, amount, description);
+        return createExpense(vehicle, category, date, amount, description, odometer);
     }
 
     public List<Expense> getExpensesByVehicle(Long vehicleId, Long userId) {

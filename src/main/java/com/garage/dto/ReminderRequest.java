@@ -1,5 +1,6 @@
 package com.garage.dto;
 
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -13,6 +14,7 @@ public class ReminderRequest {
     private String description;
 
     @NotNull(message = "Дата выполнения обязательна")
+    @FutureOrPresent(message = "Дата не может быть в прошлом")
     private LocalDate dueDate;
 
     @PositiveOrZero(message = "Стоимость не может быть отрицательной")

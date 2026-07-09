@@ -71,6 +71,12 @@
                                 <span th:text="${e.vehicle.model != null ? ' ' + e.vehicle.model : ''}"></span>
                                 <span th:if="${e.vehicle.brand == null and e.vehicle.model == null}" th:text="${e.vehicle.name}"></span>
                             </span>
+                            <span th:if="${e.odometer != null}">
+                                <i class="fas fa-tachometer-alt"></i> 
+                                При пробеге: <span th:text="${e.odometer}"></span>
+                                <span th:if="${e.vehicle.odometerUnit == 'km'}">км</span>
+                                <span th:if="${e.vehicle.odometerUnit == 'mh'}">м/ч</span>
+                            </span>
                         </span>
                     </div>
                     <div class="expense-card-desc" th:if="${e.description != null && !e.description.isEmpty()}">

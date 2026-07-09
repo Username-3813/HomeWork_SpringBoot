@@ -1,6 +1,7 @@
 package com.garage.controller;
 
 import com.garage.dto.ExpenseRequest;
+import com.garage.model.Vehicle;
 import com.garage.service.ExpenseService;
 import com.garage.service.UserService;
 import com.garage.service.VehicleService;
@@ -34,26 +35,31 @@ public class ExpensePageController {
     @GetMapping("/add/{vehicleId}")
     public String showAddForm(@PathVariable Long vehicleId, Model model) {
         Long userId = getCurrentUserId();
-        vehicleService.getVehicleByIdAndUser(vehicleId, userId);
+        Vehicle vehicle = vehicleService.getVehicleByIdAndUser(vehicleId, userId);
         ExpenseRequest request = new ExpenseRequest();
         request.setDate(LocalDate.now());
+        request.setOdometer(vehicle.getInitialOdometer());
         model.addAttribute("expense", request);
         model.addAttribute("vehicleId", vehicleId);
+        model.addAttribute("odometerUnit", vehicle.getOdometerUnit());
+        model.addAttribute("currentOdometer", vehicle.getInitialOdometer());
         return "expenses/form";
     }
 
     @PostMapping("/add/{vehicleId}")
     public String addExpense(@PathVariable Long vehicleId,
-                             @Valid @ModelAttribute("expense") ExpenseRequest dto,
-                             BindingResult bindingResult,
-                             Model model,
-                             RedirectAttributes redirectAttributes) {
+                            @Valid @ModelAttribute("expense") ExpenseRequest dto,
+                            BindingResult bindingResult,
+                            Model model,
+                            RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("vehicleId", vehicleId);
             return "expenses/form";
         }
         Long userId = getCurrentUserId();
-        expenseService.addManualExpense(vehicleId, dto.getCategory(), dto.getDate(), dto.getAmount(), dto.getDescription(), userId);
+        expenseService.addManualExpense(vehicleId, dto.getCategory(), dto.getDate(), 
+                                        dto.getAmount(), dto.getDescription(), 
+                                        dto.getOdometer(), userId);
         redirectAttributes.addFlashAttribute("success", "Расход добавлен!");
         return "redirect:/vehicles/" + vehicleId;
     }

@@ -44,7 +44,7 @@ public class RepairService {
                 "REPAIR",
                 dto.getDate(),
                 dto.getCost(),
-                "Ремонт: " + dto.getDescription()
+                "Ремонт: " + dto.getDescription(),null
         );
 
         log.info("Добавлен ремонт для ТС {} на сумму {}", vehicle.getName(), dto.getCost());

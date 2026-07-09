@@ -5,13 +5,17 @@ import com.garage.model.MaintenanceReminder;
 import com.garage.service.ReminderService;
 import com.garage.service.UserService;
 import com.garage.service.VehicleService;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -25,7 +29,7 @@ public class ReminderPageController {
 
     private Long getCurrentUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName(); // теперь это email
+        String email = auth.getName();
         return userService.findByEmail(email).getId();
     }
 
@@ -48,11 +52,20 @@ public class ReminderPageController {
         model.addAttribute("reminder", request);
         model.addAttribute("vehicleId", vehicleId);
         model.addAttribute("isEdit", false);
+        model.addAttribute("today", LocalDate.now());
         return "reminders/form";
     }
 
     @PostMapping("/add/{vehicleId}")
-    public String addReminder(@PathVariable Long vehicleId, @ModelAttribute ReminderRequest dto) {
+    public String addReminder(@PathVariable Long vehicleId,
+                            @Valid @ModelAttribute("reminder") ReminderRequest dto,
+                            BindingResult bindingResult,
+                            Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("vehicleId", vehicleId);
+            model.addAttribute("isEdit", false);
+            return "reminders/form";
+        }
         Long userId = getCurrentUserId();
         reminderService.addReminder(dto, vehicleId, userId);
         return "redirect:/reminders/vehicle/" + vehicleId;
@@ -88,10 +101,25 @@ public class ReminderPageController {
     }
 
     @PostMapping("/edit/{id}")
-    public String updateReminder(@PathVariable Long id, @ModelAttribute ReminderRequest dto) {
+    public String updateReminder(@PathVariable Long id,
+                                @Valid @ModelAttribute("reminder") ReminderRequest dto,
+                                BindingResult bindingResult,
+                                Model model) {
         Long userId = getCurrentUserId();
-        MaintenanceReminder reminder = reminderService.updateReminder(id, dto, userId);
-        return "redirect:/reminders/vehicle/" + reminder.getVehicle().getId();
+
+        if (bindingResult.hasErrors()) {
+            // Получаем vehicleId для кнопки "Отмена"
+            Long vehicleId = reminderService.getReminderById(id, userId).getVehicle().getId();
+            model.addAttribute("vehicleId", vehicleId);
+            model.addAttribute("reminderId", id);
+            model.addAttribute("isEdit", true);
+            return "reminders/form";
+        }
+
+        reminderService.updateReminder(id, dto, userId);
+
+        MaintenanceReminder updated = reminderService.getReminderById(id, userId);
+        return "redirect:/reminders/vehicle/" + updated.getVehicle().getId();
     }
 
     @GetMapping("/delete/{id}")

@@ -158,7 +158,7 @@ public class InsuranceService {
                 "INSURANCE",
                 dto.getStartDate(),
                 dto.getCost(),
-                "Страховка " + dto.getType() + " №" + dto.getPolicyNumber()
+                "Страховка " + dto.getType() + " №" + dto.getPolicyNumber(),null
         );
 
         log.info("Добавлена страховка для ТС {}", vehicle.getName());
