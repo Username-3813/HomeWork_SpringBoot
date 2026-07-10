@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -18,9 +19,15 @@ public class RegistrationRequest {
     private String password;
 
     private String lastName;
+
+    @NotBlank(message = "Имя обязательно")
     private String firstName;
+
     private String patronymic;
     private String role = "USER";
-    private LocalDate birthDate;   // добавлено
-    private String phone;          // добавлено
+
+    @Past(message = "Дата рождения не может быть в будущем")
+    private LocalDate birthDate;
+
+    private String phone;
 }

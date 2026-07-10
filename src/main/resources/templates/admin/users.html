@@ -45,6 +45,7 @@
                             </a>
                             <!-- Существующие кнопки -->
                             <a th:href="@{/admin/user/{id}/vehicles(id=${u.id})}" class="btn btn-sm btn-info">ТС</a>
+                            <a th:href="@{/admin/user/{id}/expenses(id=${u.id})}" class="btn btn-sm btn-success">Расходы</a>
                             <a th:href="@{/admin/user/{id}/edit(id=${u.id})}" class="btn btn-sm btn-warning">Изменить</a>
                             <a th:href="@{/admin/user/{id}/delete(id=${u.id})}" class="btn btn-sm btn-danger">Удалить</a>
                         </td>

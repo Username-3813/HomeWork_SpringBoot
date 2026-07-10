@@ -28,7 +28,9 @@
             </div>
             <div class="mb-3">
                 <label class="form-label">Дата рождения</label>
-                <input type="date" class="form-control" th:field="*{birthDate}">
+                <input type="date" class="form-control" th:field="*{birthDate}"
+                        th:max="${#temporals.format(#temporals.createNow(), 'dd-MM-yyyy')}">
+                <div th:if="${#fields.hasErrors('birthDate')}" class="text-danger" th:errors="*{birthDate}"></div>
             </div>
             <div class="mb-3">
                 <label class="form-label">Телефон</label>

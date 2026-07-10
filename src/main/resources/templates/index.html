@@ -5,14 +5,20 @@
     <div th:replace="fragments/header :: header"></div>
 
     <div class="container mt-5">
-        <!-- Убираем bg-light, используем кастомный класс -->
-        <div class="jumbotron text-center p-5 rounded" style="background-color: var(--bg-card); color: var(--text-body); border: 1px solid var(--border-color); box-shadow: var(--shadow-card);">
-            <h1 class="display-4">🚗 Электронный гараж</h1>
-            <p class="lead">Управляйте своей техникой, ремонтами, расходами и страховками в одном месте.</p>
-            <hr class="my-4" style="border-color: var(--border-color);">
-            <p>Войдите или зарегистрируйтесь, чтобы начать пользоваться всеми возможностями.</p>
-            <a th:href="@{/login}" class="btn btn-primary btn-lg me-2">Войти</a>
-            <a th:href="@{/register}" class="btn btn-secondary btn-lg">Регистрация</a>
+        <div class="jumbotron text-center p-5 rounded" 
+             style="background-color: var(--bg-card); color: var(--text-body); border: 1px solid var(--border-color); box-shadow: var(--shadow-card); position: relative;">
+            
+            <!-- Кнопка "Редактировать" для администратора -->
+            <div th:if="${isAdmin}" 
+                 style="position: absolute; top: 15px; right: 15px;">
+                <a href="/admin/page/home/edit" class="btn btn-sm btn-outline-secondary" 
+                   title="Редактировать главную страницу">
+                    <i class="fas fa-edit"></i> Редактировать
+                </a>
+            </div>
+
+            <!-- Динамический контент -->
+            <div th:utext="${content}"></div>
         </div>
     </div>
 

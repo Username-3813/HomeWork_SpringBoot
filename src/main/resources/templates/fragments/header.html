@@ -21,7 +21,7 @@
 <header th:fragment="header">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
         <div class="container">
-            <a class="navbar-brand" href="/"><i class="fas fa-car"></i> Электронный гараж</a>
+            <a class="navbar-brand" th:if="${currentUser != null and currentUser.role == 'ADMIN'}" href="/"><i class="fas fa-car"></i> Электронный гараж</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -34,6 +34,8 @@
                     <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
                         <a class="nav-link" href="/admin/users"><i class="fas fa-users-cog"></i> Админ</a>
                     </li>
+                    
+                    
                 </ul>
 
                 <ul class="navbar-nav align-items-center">

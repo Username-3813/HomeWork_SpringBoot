@@ -12,25 +12,47 @@
         </div>
 
         <div th:unless="${vehicles.isEmpty()}" class="table-responsive">
-            <table class="table table-striped">
+            <table class="table table-striped align-middle">
                 <thead>
                     <tr>
                         <th>Название</th>
-                        <th>Тип</th>
                         <th>Марка</th>
                         <th>Модель</th>
                         <th>Год</th>
                         <th>Госномер</th>
+                        <th>Пробег</th> 
+                        <th>Документы</th>
+                        <th>Страховки</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="v : ${vehicles}">
                         <td th:text="${v.name}"></td>
-                        <td th:text="${v.type}"></td>
                         <td th:text="${v.brand}"></td>
                         <td th:text="${v.model}"></td>
                         <td th:text="${v.year}"></td>
                         <td th:text="${v.licensePlate}"></td>
+                        <td>
+                            <span th:if="${v.initialOdometer != null}" 
+                                  th:text="${v.initialOdometer + ' ' + (v.odometerUnit == 'km' ? 'км' : 'м/ч')}"></span>
+                            <span th:unless="${v.initialOdometer != null}" class="text-muted">—</span>
+                        </td>
+                        <td>
+                            <span th:if="${!v.documents.isEmpty()}" class="badge bg-success">
+                                <i class="fas fa-check-circle"></i> Есть
+                            </span>
+                            <span th:unless="${!v.documents.isEmpty()}" class="badge bg-secondary">
+                                <i class="fas fa-times-circle"></i> Нет
+                            </span>
+                        </td>
+                        <td>
+                            <span th:if="${!v.insurances.isEmpty()}" class="badge bg-success">
+                                <i class="fas fa-check-circle"></i> Есть
+                            </span>
+                            <span th:unless="${!v.insurances.isEmpty()}" class="badge bg-secondary">
+                                <i class="fas fa-times-circle"></i> Нет
+                            </span>
+                        </td>
                     </tr>
                 </tbody>
             </table>

@@ -9,6 +9,8 @@ import com.garage.service.ProfileService;
 import com.garage.service.SiteContentService;
 import com.garage.service.UserService;
 import com.garage.service.VehicleService;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,6 +45,7 @@ public class AdminController {
     }
 
     // ТС пользователя
+    @Transactional
     @GetMapping("/user/{userId}/vehicles")
     public String userVehicles(@PathVariable Long userId, Model model) {
         User user = userService.findById(userId);
