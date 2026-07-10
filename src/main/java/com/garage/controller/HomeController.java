@@ -31,15 +31,7 @@ public class HomeController {
             return "redirect:/vehicles";
         }
 
-        // Получаем контент главной страницы
-        String defaultContent = "<h1 class=\"display-4\">🚗 Электронный гараж</h1>"
-                + "<p class=\"lead\">Управляйте своей техникой, ремонтами, расходами и страховками в одном месте.</p>"
-                + "<hr class=\"my-4\">"
-                + "<p>Войдите или зарегистрируйтесь, чтобы начать пользоваться всеми возможностями.</p>"
-                + "<a href=\"/login\" class=\"btn btn-primary btn-lg me-2\">Войти</a>"
-                + "<a href=\"/register\" class=\"btn btn-secondary btn-lg\">Регистрация</a>";
-
-        String content = siteContentService.getContent("home", defaultContent);
+        String content = siteContentService.getContent("home", "Контент не задан!");
         model.addAttribute("content", content);
         model.addAttribute("isAdmin", isAdmin); // передаём в шаблон, чтобы показать кнопку
         return "index";
