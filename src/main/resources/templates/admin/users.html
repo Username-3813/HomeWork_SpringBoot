@@ -22,7 +22,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="u : ${users}">
+                    <tr th:each="u : ${userPage.content}">
                         <td th:text="${u.id}"></td>
                         <td th:text="${u.email}"></td>
                         <td th:text="${u.fullName}"></td>
@@ -50,8 +50,33 @@
                             <a th:href="@{/admin/user/{id}/delete(id=${u.id})}" class="btn btn-sm btn-danger">Удалить</a>
                         </td>
                     </tr>
+                    <tr th:if="${userPage.isEmpty()}">
+                        <td colspan="5" class="text-center">Нет пользователей</td>
+                    </tr>
                 </tbody>
             </table>
+        </div>
+
+        <!-- Пагинация -->
+        <div th:if="${totalPages > 1}" class="d-flex justify-content-center mt-4">
+            <nav>
+                <ul class="pagination pagination-sm">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                        <a class="page-link" th:href="@{/admin/users(page=${currentPage - 1}, size=${size})}">&laquo;</a>
+                    </li>
+                    <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                        class="page-item" th:classappend="${i == currentPage} ? 'active' : ''">
+                        <a class="page-link" th:href="@{/admin/users(page=${i}, size=${size})}" th:text="${i + 1}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                        <a class="page-link" th:href="@{/admin/users(page=${currentPage + 1}, size=${size})}">&raquo;</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="text-muted small text-center mt-2">
+            Показано <span th:text="${pageSize}"></span> из <span th:text="${totalItems}"></span> записей
         </div>
 
         <a href="/vehicles" class="btn btn-secondary mt-3">

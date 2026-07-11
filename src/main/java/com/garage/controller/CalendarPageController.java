@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -32,21 +33,43 @@ public class CalendarPageController {
     }
 
     @GetMapping
-    public String showCalendar(Model model) {
+    public String showCalendar(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Model model) {
+
         Long userId = getCurrentUserId();
 
-        // Получаем ВСЕ события (без ограничения по дате)
-        List<NotificationDto> notifications = notificationService.getAllNotifications(userId);
+        // Получаем ВСЕ события (уже отсортированы в сервисе)
+        List<NotificationDto> allNotifications = notificationService.getAllNotifications(userId);
 
-        // Группировка по дате
-        Map<LocalDate, List<NotificationDto>> groupedByDate = notifications.stream()
+        int totalItems = allNotifications.size();
+
+        // Вычисляем границы страницы
+        int start = Math.min(page * size, totalItems);
+        int end = Math.min(start + size, totalItems);
+
+        // Берём только нужный кусок списка
+        List<NotificationDto> pageNotifications = allNotifications.subList(start, end);
+
+        // Группировка по дате (только для текущей страницы)
+        Map<LocalDate, List<NotificationDto>> groupedByDate = pageNotifications.stream()
                 .collect(Collectors.groupingBy(
                         NotificationDto::getDate,
                         TreeMap::new,
                         Collectors.toList()
                 ));
 
+        // Параметры пагинации
+        int totalPages = (totalItems == 0) ? 1 : (int) Math.ceil((double) totalItems / size);
+
         model.addAttribute("groupedNotifications", groupedByDate);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalItems", totalItems);
+        model.addAttribute("pageSize", pageNotifications.size());
+        model.addAttribute("size", size);
+
         return "calendar/index";
     }
 }

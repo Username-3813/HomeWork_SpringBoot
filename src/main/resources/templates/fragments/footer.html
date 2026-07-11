@@ -14,13 +14,7 @@
             </div>
             <div class="col-md-6 text-end">
                 <a href="/about" class="text-muted small me-2">О проекте</a>
-                <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-                    <a href="/admin/page/about/edit" class="text-muted small me-2">Ред. "О проекте"</a>
-                </span>
                 <a href="/contacts" class="text-muted small me-2">Контакты</a>
-                <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-                    <a href="/admin/page/contacts/edit" class="text-muted small">Ред. "Контакты"</a>
-                </span>
             </div>
         </div>
     </div>

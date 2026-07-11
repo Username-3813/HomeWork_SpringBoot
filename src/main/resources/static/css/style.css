@@ -675,6 +675,104 @@ body.dark-theme .alert-info {
 body.dark-theme .alert-info a {
     color: #7aaae0;
 }
+/* ============================================
+   ТЁМНАЯ ТЕМА ДЛЯ ВЫПАДАЮЩИХ МЕНЮ (колокольчик, профиль)
+   ============================================ */
+body.dark-theme .dropdown-menu {
+    background-color: var(--bg-card) !important;
+    border-color: var(--border-color) !important;
+    box-shadow: var(--shadow-card) !important;
+}
+
+body.dark-theme .dropdown-item {
+    color: var(--text-body) !important;
+}
+
+body.dark-theme .dropdown-item:hover,
+body.dark-theme .dropdown-item:focus {
+    background-color: var(--bg-hover) !important;
+    color: var(--text-body) !important;
+}
+
+body.dark-theme .dropdown-item.text-muted {
+    color: var(--text-muted) !important;
+}
+
+body.dark-theme .dropdown-divider {
+    border-color: var(--border-color) !important;
+}
+
+body.dark-theme .dropdown-header {
+    color: var(--text-muted) !important;
+}
+/* ============================================
+   СТИЛИ ДЛЯ СТРАНИЦ КОНТЕНТА (about, contacts)
+   ============================================ */
+.page-content {
+    color: var(--text-body);
+}
+
+.page-content h1,
+.page-content h2,
+.page-content h3,
+.page-content h4,
+.page-content h5,
+.page-content h6 {
+    color: var(--text-body);
+}
+
+.page-content a:not(.btn) {
+    color: var(--text-link);
+}
+.page-content a:not(.btn):hover {
+    color: var(--text-link);
+    opacity: 0.8;
+}
+
+.page-content .text-primary {
+    color: var(--text-link) !important;
+}
+.page-content .text-secondary {
+    color: var(--text-light) !important;
+}
+.page-content .text-muted {
+    color: var(--text-muted) !important;
+}
+
+.page-content ul,
+.page-content ol,
+.page-content li,
+.page-content p,
+.page-content .lead {
+    color: var(--text-body);
+}
+
+.page-content hr {
+    border-color: var(--border-color);
+}
+
+.page-content .card {
+    background-color: var(--bg-card) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-body) !important;
+}
+
+.page-content .card .text-primary {
+    color: var(--text-link) !important;
+}
+
+.page-content .list-unstyled li {
+    color: var(--text-body);
+}
+
+.page-content .btn-outline-primary {
+    color: var(--text-link);
+    border-color: var(--text-link);
+}
+.page-content .btn-outline-primary:hover {
+    background-color: var(--text-link);
+    color: var(--text-white);
+}
 
 /* ============================================
    АДАПТИВНОСТЬ

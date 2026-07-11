@@ -67,7 +67,10 @@
             </div>
         </div>
 
-        <a th:href="@{/vehicles/{id}(id=${vehicleId})}" class="btn btn-secondary mt-3">
+       <a th:if="${from == 'calendar'}" href="/calendar" class="btn btn-secondary mt-3">
+            <i class="fas fa-arrow-left"></i> Назад
+        </a>
+        <a th:unless="${from == 'calendar'}" th:href="@{/vehicles/{id}(id=${vehicleId})}" class="btn btn-secondary mt-3">
             <i class="fas fa-arrow-left"></i> Назад к ТС
         </a>
     </div>

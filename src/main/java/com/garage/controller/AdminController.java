@@ -36,11 +36,20 @@ public class AdminController {
     private final ProfileService profileService;
     private final SiteContentService siteContentService;
 
-    // Список всех пользователей
+    // Список всех пользователей с пагинацией
     @GetMapping("/users")
-    public String listUsers(Model model) {
-        List<User> users = userService.findAll();
-        model.addAttribute("users", users);
+    public String listUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Model model) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        Page<User> userPage = userService.findAll(pageable);
+        model.addAttribute("userPage", userPage);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", userPage.getTotalPages());
+        model.addAttribute("totalItems", userPage.getTotalElements());
+        model.addAttribute("pageSize", userPage.getNumberOfElements());
+        model.addAttribute("size", size);
         return "admin/users";
     }
 
@@ -131,6 +140,14 @@ public class AdminController {
                         RedirectAttributes redirectAttributes) {
         siteContentService.saveContent(page, content);
         redirectAttributes.addFlashAttribute("success", "Страница обновлена");
-        return "redirect:/admin/page/" + page + "/edit";
+        
+        // Редирект на соответствующую страницу
+        String redirectUrl = switch (page) {
+            case "home" -> "/";
+            case "about" -> "/about";
+            case "contacts" -> "/contacts";
+            default -> "/";
+        };
+        return "redirect:" + redirectUrl;
     }
 }

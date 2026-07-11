@@ -35,12 +35,13 @@ public class InsurancePageController {
     }
 
     @GetMapping("/vehicle/{vehicleId}")
-    public String listInsurances(@PathVariable Long vehicleId, Model model) {
+    public String listInsurances(@PathVariable Long vehicleId, Model model, @RequestParam(required = false) String from) {
         Long userId = getCurrentUserId();
         vehicleService.getVehicleByIdAndUser(vehicleId, userId);
         List<InsurancePolicy> policies = insuranceService.getInsurancesByVehicle(vehicleId, userId);
         model.addAttribute("insurances", policies);
         model.addAttribute("vehicleId", vehicleId);
+        model.addAttribute("from", from);
         return "insurances/list";
     }
 
