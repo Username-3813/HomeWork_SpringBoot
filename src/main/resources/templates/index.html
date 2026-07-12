@@ -5,18 +5,15 @@
     <div th:replace="fragments/header :: header"></div>
 
     <div class="container mt-5">
-        <!-- Кнопка редактирования для администратора (справа) -->
         <div th:if="${#authorization.expression('hasRole(''ADMIN'')')}" class="mb-3 text-end">
             <a href="/admin/page/home/edit" class="btn btn-sm btn-outline-secondary">
                 <i class="fas fa-edit"></i> Редактировать
             </a>
         </div>
 
-        <!-- Основной блок -->
         <div class="jumbotron text-center p-5 rounded" 
              style="background-color: var(--bg-card); color: var(--text-body); border: 1px solid var(--border-color); box-shadow: var(--shadow-card);">
 
-            <!-- Динамический контент -->
             <div th:utext="${content}"></div>
         </div>
     </div>

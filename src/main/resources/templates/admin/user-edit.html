@@ -36,7 +36,6 @@
                 <div th:if="${#fields.hasErrors('birthDate')}" class="text-danger" th:errors="*{birthDate}"></div>
             </div>
 
-            <!-- Поле телефона с маской (как в профиле) -->
             <div class="mb-3">
                 <label class="form-label">Телефон</label>
                 <input type="tel" class="form-control" th:field="*{phone}" id="phoneInput" placeholder="+7 (999) 999-99-99" maxlength="18">
@@ -61,19 +60,13 @@
             const phoneInput = document.getElementById('phoneInput');
             if (!phoneInput) return;
 
-            // Функция форматирования номера
             function formatPhone(value) {
-                // Удаляем все нецифровые символы
                 let numbers = value.replace(/\D/g, '');
-                // Ограничиваем 11 цифрами (для +7)
                 if (numbers.length > 11) numbers = numbers.slice(0, 11);
-                
-                // Если номер начинается с 8, заменяем на 7 (для стандартизации)
                 if (numbers.startsWith('8')) {
                     numbers = '7' + numbers.slice(1);
                 }
                 
-                // Форматируем
                 let formatted = '';
                 if (numbers.length > 0) {
                     formatted = '+7';
@@ -93,27 +86,23 @@
                 return formatted;
             }
 
-            // При вводе
             phoneInput.addEventListener('input', function(e) {
                 const start = this.selectionStart;
                 const end = this.selectionEnd;
                 const oldValue = this.value;
                 const newValue = formatPhone(this.value);
                 this.value = newValue;
-                
-                // Восстанавливаем позицию курсора
+
                 if (oldValue.length !== newValue.length) {
                     const delta = newValue.length - oldValue.length;
                     this.setSelectionRange(start + delta, end + delta);
                 }
             });
 
-            // При потере фокуса (дополнительное форматирование)
             phoneInput.addEventListener('blur', function() {
                 this.value = formatPhone(this.value);
             });
 
-            // При загрузке отформатировать существующее значение
             phoneInput.value = formatPhone(phoneInput.value);
         });
     </script>

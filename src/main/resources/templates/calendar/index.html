@@ -5,7 +5,7 @@
     <div th:replace="fragments/header :: header"></div>
 
     <div class="container mt-4">
-        <h2>📅 Календарь напоминаний</h2>
+        <h2>Календарь напоминаний</h2>
 
         <div th:if="${totalItems == 0}" class="alert alert-info">
             Нет ни одного напоминания.
@@ -57,7 +57,6 @@
                 </div>
             </div>
 
-            <!-- Пагинация -->
             <div th:if="${totalPages > 1}" class="d-flex justify-content-center mt-4">
                 <nav>
                     <ul class="pagination pagination-sm">

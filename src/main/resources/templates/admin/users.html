@@ -5,7 +5,7 @@
     <div th:replace="fragments/header :: header"></div>
 
     <div class="container mt-4">
-        <h2>👥 Пользователи</h2>
+        <h2>Пользователи</h2>
 
         <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
@@ -32,7 +32,6 @@
                             </span>
                         </td>
                         <td>
-                            <!-- Кнопки для управления ролью -->
                             <a th:if="${u.role == 'USER'}" 
                                th:href="@{/admin/promote/{id}(id=${u.id})}" 
                                class="btn btn-sm btn-warning">
@@ -43,7 +42,6 @@
                                class="btn btn-sm btn-secondary">
                                 Убрать из админа
                             </a>
-                            <!-- Существующие кнопки -->
                             <a th:href="@{/admin/user/{id}/vehicles(id=${u.id})}" class="btn btn-sm btn-info">ТС</a>
                             <a th:href="@{/admin/user/{id}/expenses(id=${u.id})}" class="btn btn-sm btn-success">Расходы</a>
                             <a th:href="@{/admin/user/{id}/edit(id=${u.id})}" class="btn btn-sm btn-warning">Изменить</a>
@@ -57,7 +55,6 @@
             </table>
         </div>
 
-        <!-- Пагинация -->
         <div th:if="${totalPages > 1}" class="d-flex justify-content-center mt-4">
             <nav>
                 <ul class="pagination pagination-sm">

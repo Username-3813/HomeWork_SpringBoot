@@ -34,12 +34,15 @@ public class ReminderPageController {
     }
 
     @GetMapping("/vehicle/{vehicleId}")
-    public String listReminders(@PathVariable Long vehicleId, Model model) {
+    public String listReminders(@PathVariable Long vehicleId, 
+                                Model model, 
+                                @RequestParam(required = false) String from) {
         Long userId = getCurrentUserId();
         vehicleService.getVehicleByIdAndUser(vehicleId, userId);
         List<MaintenanceReminder> reminders = reminderService.getRemindersByVehicle(vehicleId, userId);
         model.addAttribute("reminders", reminders);
         model.addAttribute("vehicleId", vehicleId);
+        model.addAttribute("from", from);
         return "reminders/list";
     }
 
@@ -108,7 +111,6 @@ public class ReminderPageController {
         Long userId = getCurrentUserId();
 
         if (bindingResult.hasErrors()) {
-            // Получаем vehicleId для кнопки "Отмена"
             Long vehicleId = reminderService.getReminderById(id, userId).getVehicle().getId();
             model.addAttribute("vehicleId", vehicleId);
             model.addAttribute("reminderId", id);
