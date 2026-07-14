@@ -70,7 +70,7 @@ public class ExpenseService {
 
     @Transactional
     public void deleteExpense(Long id, Long userId) {
-        Expense expense = getExpenseById(id, userId);
+        getExpenseById(id, userId);
         expenseRepository.deleteById(id);
         log.info("Расход удалён (ID: {})", id);
     }
@@ -83,10 +83,10 @@ public class ExpenseService {
         return expenseRepository.findByVehicle_User_Id(userId, pageable);
     }
 
-    // НОВЫЙ МЕТОД: фильтрация с пагинацией
+    //фильтрация с пагинацией
     public Page<Expense> getFilteredExpenses(Long userId, Long vehicleId, LocalDate from, LocalDate to,
                                              List<String> categories, List<String> vehicleTypes, Pageable pageable) {
-        Specification<Expense> spec = Specification.where(ExpenseSpecifications.filterByUserId(userId));
+        Specification<Expense> spec = ExpenseSpecifications.filterByUserId(userId);
 
         if (vehicleId != null && vehicleId > 0) {
             spec = spec.and(ExpenseSpecifications.filterByVehicleId(vehicleId));

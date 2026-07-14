@@ -7,7 +7,6 @@
     <div class="container mt-4">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/vehicles">Главная</a></li>
                 <li class="breadcrumb-item active" th:text="${vehicle.name}">ТС</li>
             </ol>
         </nav>
@@ -67,8 +66,8 @@
                     <dt class="col-sm-4">VIN-номер</dt>
                     <dd class="col-sm-8" th:text="${vehicle.vin ?: '—'}"></dd>
 
-                    <dt class="col-sm-4">Начальный <span th:if="${vehicle.odometerUnit == 'km'}">пробег</span>
-                        <span th:if="${vehicle.odometerUnit == 'mh'}">моточасы</span></dt>
+                    <dt class="col-sm-4"><span th:if="${vehicle.odometerUnit == 'km'}">Пробег</span>
+                        <span th:if="${vehicle.odometerUnit == 'mh'}">Моточасы</span></dt>
                     <dd class="col-sm-8" th:text="${vehicle.initialOdometer ?: '—'}">
                         <span th:if="${vehicle.odometerUnit == 'km'}"> км</span>
                         <span th:if="${vehicle.odometerUnit == 'mh'}"> м/ч</span>

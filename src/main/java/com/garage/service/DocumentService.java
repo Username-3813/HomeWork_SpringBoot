@@ -62,13 +62,11 @@ public class DocumentService {
     }
 
     public Document getDocumentById(Long id, Long userId) {
-        Document document = documentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Документ не найден (ID: " + id + ")"));
+        Document document = documentRepository.findById(id).orElseThrow(() -> new RuntimeException("Документ не найден (ID: " + id + ")"));
         vehicleService.getVehicleByIdAndUser(document.getVehicle().getId(), userId);
         return document;
     }
 
-    // ИСПРАВЛЕННЫЙ МЕТОД — исключаем документы страховок
     public List<Document> getDocumentsByVehicle(Long vehicleId, Long userId) {
         vehicleService.getVehicleByIdAndUser(vehicleId, userId);
         return documentRepository.findNonInsuranceDocumentsByVehicleId(vehicleId);
